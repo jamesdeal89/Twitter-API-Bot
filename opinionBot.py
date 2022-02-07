@@ -13,9 +13,11 @@ auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
 auth.set_access_token(ACCESS_KEY, ACCESS_SECRET)
 api = tweepy.API(auth)
 
-checkedIDs = []
+
 
 def checkData():
+    #opens the log of previously replied tweet IDs to make sure there's no doubled up replies
+    fileData = open("logged.txt","r+")
     # gets the raw data of all the tweets @ the bot
     # includes lots and lots of complex data we don't need
     mentions = api.mentions_timeline()
@@ -24,7 +26,7 @@ def checkData():
     # iterates through every tweet @ the bot
     for tweet in mentions:
         # checks to make sure we don't reply to tweets we've already replied to
-        if tweet.id in checkedIDs:
+        if str(tweet.id) in fileData.read():
             pass
         else:
             # prints the tweet ID and pure extracted tweet text
@@ -38,43 +40,44 @@ def checkData():
                     print("tweeting")
                     # makes a tweet @ing the user. the 'tweet.id' makes it go into a response to a specific thread
                     api.update_status(status = "@" + tweet.user.screen_name + " hyped!", in_reply_to_status_id = tweet.id , auto_populate_reply_metadata=True)
-                    # adds replied tweet ID to list
-                    checkedIDs.append(tweet.id)
+                    # adds replied tweet ID to file
+                    fileData.write(str(tweet.id)+"%d\r\n")
                 # checks if the tweet has negative sentiment
                 elif sentimentTweet.sentiment.polarity < 0:
                     print("tweeting")
                     api.update_status(status = "@" + tweet.user.screen_name + " you're wrong; The Batman is going to be great", in_reply_to_status_id = tweet.id , auto_populate_reply_metadata=True)
-                    checkedIDs.append(tweet.id)
+                    fileData.write(str(tweet.id)+"%d\r\n")
             if 'mr.davies' in tweet.text.lower():
                 sentimentTweet = textblob.TextBlob(tweet.text)
                 if sentimentTweet.sentiment.polarity >= 0:
                     print("tweeting")
                     # makes a tweet @ing the user. the 'tweet.id' makes it go into a response to a specific thread
                     api.update_status(status = "@" + tweet.user.screen_name + " I know that guy!", in_reply_to_status_id = tweet.id , auto_populate_reply_metadata=True)
-                    checkedIDs.append(tweet.id)
-                    # adds replied tweet ID to list
+                    fileData.write(str(tweet.id)+"%d\r\n")
+                    # adds replied tweet ID to file
                 elif sentimentTweet.sentiment.polarity < 0:
                     print("tweeting")
                     # makes a tweet @ing the user. the 'tweet.id' makes it go into a response to a specific thread
                     api.update_status(status = "@" + tweet.user.screen_name + " Don't talk about him like that!", in_reply_to_status_id = tweet.id , auto_populate_reply_metadata=True)
-                    checkedIDs.append(tweet.id)
-                    # adds replied tweet ID to list
+                    fileData.write(str(tweet.id)+"%d\r\n")
+                    # adds replied tweet ID to file
             if 'twitter api' in tweet.text.lower():
                 # makes a tweet @ing the user. the 'tweet.id' makes it go into a response to a specific thread
                 print("tweeting")
                 api.update_status(status = "@" + tweet.user.screen_name + " I use that!", in_reply_to_status_id = tweet.id , auto_populate_reply_metadata=True)
-                checkedIDs.append(tweet.id)
-                # adds replied tweet ID to list
+                fileData.write(str(tweet.id)+"%d\r\n")
+                # adds replied tweet ID to file
             if 'you' in tweet.text.lower() or ' opinionbotcs' in tweet.text.lower():
                 sentimentTweet = textblob.TextBlob(tweet.text)
                 if sentimentTweet.sentiment.polarity >= 0:
                     print("tweeting")
                     api.update_status(status = "@" + tweet.user.screen_name + " Thank you for your feedback!", in_reply_to_status_id = tweet.id , auto_populate_reply_metadata=True)
-                    checkedIDs.append(tweet.id)
+                    fileData.write(str(tweet.id)+"%d\r\n")
                 elif sentimentTweet.sentiment.polarity < 0:
                     print("tweeting")
                     api.update_status(status = "@" + tweet.user.screen_name + " That's just rude!", in_reply_to_status_id = tweet.id , auto_populate_reply_metadata=True)
-                    checkedIDs.append(tweet.id)
+                    fileData.write(str(tweet.id)+"%d\r\n")
+    fileData.close()
 
 
 while True:
