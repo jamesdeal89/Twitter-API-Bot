@@ -32,7 +32,7 @@ def checkData():
             # checks for a specific hastag in the tweet.
             if '#thebatman' in tweet.text.lower():
                 # creates a TextBlob version of the tweet for sentiment analysis
-                sentimentTweet = TextBlob(tweet.text)
+                sentimentTweet = textblob.TextBlob(tweet.text)
                 # checks if the tweet has positive sentiment
                 if sentimentTweet.sentiment.polarity >= 0:
                     print("tweeting")
@@ -41,12 +41,12 @@ def checkData():
                     # adds replied tweet ID to list
                     checkedIDs.append(tweet.id)
                 # checks if the tweet has negative sentiment
-                elif sentimentTweet.sentiment.polairty < 0:
-                    print("tweeeting")
-                    api.update_status(status = "@" + tweet.user.screen_name + " you're wrong; The Batan is going to be great", in_reply_to_status_id = tweet.id , auto_populate_reply_metadata=True)
+                elif sentimentTweet.sentiment.polarity < 0:
+                    print("tweeting")
+                    api.update_status(status = "@" + tweet.user.screen_name + " you're wrong; The Batman is going to be great", in_reply_to_status_id = tweet.id , auto_populate_reply_metadata=True)
                     checkedIDs.append(tweet.id)
             if 'mr.davies' in tweet.text.lower():
-                sentimentTweet = TextBlob(tweet.text)
+                sentimentTweet = textblob.TextBlob(tweet.text)
                 if sentimentTweet.sentiment.polarity >= 0:
                     print("tweeting")
                     # makes a tweet @ing the user. the 'tweet.id' makes it go into a response to a specific thread
@@ -65,6 +65,17 @@ def checkData():
                 api.update_status(status = "@" + tweet.user.screen_name + " I use that!", in_reply_to_status_id = tweet.id , auto_populate_reply_metadata=True)
                 checkedIDs.append(tweet.id)
                 # adds replied tweet ID to list
+            if 'you' in tweet.text.lower() or ' opinionbotcs' in tweet.text.lower():
+                sentimentTweet = textblob.TextBlob(tweet.text)
+                if sentimentTweet.sentiment.polarity >= 0:
+                    print("tweeting")
+                    api.update_status(status = "@" + tweet.user.screen_name + " Thank you for your feedback!", in_reply_to_status_id = tweet.id , auto_populate_reply_metadata=True)
+                    checkedIDs.append(tweet.id)
+                elif sentimentTweet.sentiment.polarity < 0:
+                    print("tweeting")
+                    api.update_status(status = "@" + tweet.user.screen_name + " That's just rude!", in_reply_to_status_id = tweet.id , auto_populate_reply_metadata=True)
+                    checkedIDs.append(tweet.id)
+
 
 while True:
     checkData()
