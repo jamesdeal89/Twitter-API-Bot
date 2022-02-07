@@ -3,7 +3,6 @@ import tweepy
 import textblob
 import time
 
-global api, CONSUMER_KEY, CONSUMER_SECRET, ACCESS_KEY, ACCESS_SECRET, auth
 # authentication for Twitter API
 CONSUMER_KEY = 'ed03MoV3IRwE083w1Kqx1RxZ0'
 CONSUMER_SECRET = 'zQ1GME6Z4bTdyHC5hpmNdt6WyJ1AAhUCQOYtOd4A6cFWJBdncB'
@@ -14,93 +13,102 @@ auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
 auth.set_access_token(ACCESS_KEY, ACCESS_SECRET)
 api = tweepy.API(auth)
 
-def trendAnalysis():
-    #find hashtag
-    location = tweet.text.find("#")
-    hashtag = tweet.text[location:]
-    print(hashtag)
-    #get sample of tweets using tweepy Cursor search the '.items' is the size of the sample. 'lang='en'' makes sure we get tweets which TextBlob can analyse.
-    sample = api.search_tweets(q=hashtag, lang = 'en')
-    #analyse tweet sentiments
-    totalPolarity = 0
-    for dataPoint in sample:
-        print(dataPoint.text)
-        dataText = textblob.TextBlob(dataPoint.text)
-        totalPolarity += dataText.sentiment.polarity 
-    #create average sentiment score
-    avgPolarity = totalPolarity / 50
-    #return score to user in a reply
-    api.update_status(status = "@" + tweet.user.screen_name + " The polarity of " + hashtag + " is:" + str(avgPolarity), in_reply_to_status_id = tweet.id , auto_populate_reply_metadata=True)
-    # adds replied tweet ID to file
-    fileData.write(str(tweet.id)+"\n")
+loggedID= []
 
 def checkData():
-    global mentions, tweet, fileData
-    #opens the log of previously replied tweet IDs to make sure there's no doubled up replies
-    fileData = open("logged.txt","r+")
     # gets the raw data of all the tweets @ the bot
     # includes lots and lots of complex data we don't need
     mentions = api.mentions_timeline()
     # converts the data in the first mention into a dictionary
     mentions[0].__dict__
-    # iterates through every tweet @ the bot
+    # iterates through every tweet @ the bot    
     for tweet in mentions:
         # checks to make sure we don't reply to tweets we've already replied to
-        if str(tweet.id) in fileData.read():
-            pass
-        else:
-            # prints the tweet ID and pure extracted tweet text
-            print(tweet.id, tweet.text)
-            # checks for a specific hastag in the tweet.
-            if '#thebatman' in tweet.text.lower():
-                # creates a TextBlob version of the tweet for sentiment analysis
-                sentimentTweet = textblob.TextBlob(tweet.text)
-                # checks if the tweet has positive sentiment
+        # prints the tweet ID and pure extracted tweet text
+        print(tweet.id, tweet.text)
+        # checks for a specific hastag in the tweet.
+        if '#thebatman' in tweet.text.lower():
+            # creates a TextBlob version of the tweet for sentiment analysis
+            sentimentTweet = textblob.TextBlob(tweet.text)
+            # checks if the tweet has positive sentiment
+            if tweet.id in loggedID:
+                print("skipping "+ str(tweet.id))
+            else:
                 if sentimentTweet.sentiment.polarity >= 0:
                     print("tweeting")
                     # makes a tweet @ing the user. the 'tweet.id' makes it go into a response to a specific thread
                     api.update_status(status = "@" + tweet.user.screen_name + " hyped!", in_reply_to_status_id = tweet.id , auto_populate_reply_metadata=True)
                     # adds replied tweet ID to file
-                    fileData.write(str(tweet.id)+"\n")
+                    loggedID.append(tweet.id)
                 # checks if the tweet has negative sentiment
                 elif sentimentTweet.sentiment.polarity < 0:
                     print("tweeting")
                     api.update_status(status = "@" + tweet.user.screen_name + " you're wrong; The Batman is going to be great", in_reply_to_status_id = tweet.id , auto_populate_reply_metadata=True)
-                    fileData.write(str(tweet.id)+"\n")
-            if 'mr.davies' in tweet.text.lower():
-                sentimentTweet = textblob.TextBlob(tweet.text)
+                    loggedID.append(tweet.id)
+        if 'mr.davies' in tweet.text.lower():
+            sentimentTweet = textblob.TextBlob(tweet.text)
+            if tweet.id in loggedID:
+                print("skipping "+ str(tweet.id))
+            else:
                 if sentimentTweet.sentiment.polarity >= 0:
                     print("tweeting")
                     # makes a tweet @ing the user. the 'tweet.id' makes it go into a response to a specific thread
                     api.update_status(status = "@" + tweet.user.screen_name + " I know that guy!", in_reply_to_status_id = tweet.id , auto_populate_reply_metadata=True)
-                    fileData.write(str(tweet.id)+"\n")
+                    loggedID.append(tweet.id)
                     # adds replied tweet ID to file
                 elif sentimentTweet.sentiment.polarity < 0:
                     print("tweeting")
                     # makes a tweet @ing the user. the 'tweet.id' makes it go into a response to a specific thread
                     api.update_status(status = "@" + tweet.user.screen_name + " Don't talk about him like that!", in_reply_to_status_id = tweet.id , auto_populate_reply_metadata=True)
-                    fileData.write(str(tweet.id)+"\n")
+                    loggedID.append(tweet.id)
                     # adds replied tweet ID to file
-            if 'twitter api' in tweet.text.lower():
+        if 'twitter api' in tweet.text.lower():
+            if tweet.id in loggedID:
+                print("skipping "+ str(tweet.id))
+            else:
                 # makes a tweet @ing the user. the 'tweet.id' makes it go into a response to a specific thread
                 print("tweeting")
                 api.update_status(status = "@" + tweet.user.screen_name + " I use that!", in_reply_to_status_id = tweet.id , auto_populate_reply_metadata=True)
-                fileData.write(str(tweet.id)+"\n")
+                loggedID.append(tweet.id)
                 # adds replied tweet ID to file
-            if 'you' in tweet.text.lower() or ' opinionbotcs' in tweet.text.lower():
-                sentimentTweet = textblob.TextBlob(tweet.text)
+        if 'you' in tweet.text.lower() or ' opinionbotcs' in tweet.text.lower():
+            sentimentTweet = textblob.TextBlob(tweet.text)
+            if tweet.id in loggedID:
+                print("skipping "+ str(tweet.id))
+            else:
                 if sentimentTweet.sentiment.polarity >= 0:
                     print("tweeting")
                     api.update_status(status = "@" + tweet.user.screen_name + " Thank you for your feedback!", in_reply_to_status_id = tweet.id , auto_populate_reply_metadata=True)
-                    fileData.write(str(tweet.id)+"\n")
+                    loggedID.append(tweet.id)
                 elif sentimentTweet.sentiment.polarity < 0:
                     print("tweeting")
                     api.update_status(status = "@" + tweet.user.screen_name + " That's just rude!", in_reply_to_status_id = tweet.id , auto_populate_reply_metadata=True)
-                    fileData.write(str(tweet.id)+"\n")
-            if 'analyse' in tweet.text.lower():
-                trendAnalysis()
-                fileData.write(str(tweet.id)+"\n")
-    fileData.close()
+                    loggedID.append(tweet.id)
+        if 'analyse' in tweet.text.lower():
+            #find hashtag
+            print(tweet.id, loggedID) 
+            if str(tweet.id) in str(loggedID):
+                print("skipping "+ str(tweet.id))
+            else:
+                location = tweet.text.find("#")
+                hashtag = tweet.text[location:]
+                print(hashtag)
+                #get sample of tweets using tweepy Cursor search the '.items' is the size of the sample. 'lang='en'' makes sure we get tweets which TextBlob can analyse.
+                sample = api.search_tweets(q=hashtag, lang = 'en')
+                #analyse tweet sentiments
+                totalPolarity = 0
+                counter = 0
+                for dataPoint in sample:
+                    counter += 1
+                    dataText = textblob.TextBlob(dataPoint.text)
+                    totalPolarity += dataText.sentiment.polarity 
+                #create average sentiment score
+                avgPolarity = totalPolarity / counter
+                #return score to user in a reply
+                api.update_status(status = "@" + tweet.user.screen_name + " The sentiment polarity of " + hashtag + " is:" + str(avgPolarity) + " based on " + str(counter) + " samples", in_reply_to_status_id = tweet.id , auto_populate_reply_metadata=True)
+                # adds replied tweet ID to file
+                loggedID.append(tweet.id)
+                
 
 
 while True:
@@ -109,7 +117,7 @@ while True:
 
 
 """
-testing and making notes on textblob sentiment analysis
+making notes on textblob sentiment analysis
 the text to be analysed must be put into the textblob data structure using TextBlob(text)
 using .tags we can see the words in a 2d array of token and sentiment tag. 
 .sentences will break a textblob into sentence tokens
