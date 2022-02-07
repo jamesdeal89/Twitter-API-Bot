@@ -1,5 +1,6 @@
 # practice exploring the Twitter API via a basic bot (@opinionbotCS)
 import tweepy
+import textblob
 import time
 
 # authentication for Twitter API
@@ -30,26 +31,52 @@ def checkData():
             print(tweet.id, tweet.text)
             # checks for a specific hastag in the tweet.
             if '#thebatman' in tweet.text.lower():
-                # makes a tweet @ing the user. the 'tweet.id' makes it go into a response to a specific thread
-                print("tweeting")
-                api.update_status(status = "@" + tweet.user.screen_name + " hyped!", in_reply_to_status_id = tweet.id , auto_populate_reply_metadata=True)
-                # adds replied tweet ID to list
-                checkedIDs.append(tweet.id)
-            if 'mr.davies' in tweet.text.lower():
-                # makes a tweet @ing the user. the 'tweet.id' makes it go into a response to a specific thread
-                print("tweeting")
-                api.update_status(status = "@" + tweet.user.screen_name + " cringe.", in_reply_to_status_id = tweet.id , auto_populate_reply_metadata=True)
-                checkedIDs.append(tweet.id)
-                # adds replied tweet ID to list
-            if 'twitter api' in tweet.text.lower():
-                    # makes a tweet @ing the user. the 'tweet.id' makes it go into a response to a specific thread
+                # creates a TextBlob version of the tweet for sentiment analysis
+                sentimentTweet = TextBlob(tweet.text)
+                # checks if the tweet has positive sentiment
+                if sentimentTweet.sentiment.polarity >= 0:
                     print("tweeting")
-                    api.update_status(status = "@" + tweet.user.screen_name + " I use that!", in_reply_to_status_id = tweet.id , auto_populate_reply_metadata=True)
+                    # makes a tweet @ing the user. the 'tweet.id' makes it go into a response to a specific thread
+                    api.update_status(status = "@" + tweet.user.screen_name + " hyped!", in_reply_to_status_id = tweet.id , auto_populate_reply_metadata=True)
+                    # adds replied tweet ID to list
+                    checkedIDs.append(tweet.id)
+                # checks if the tweet has negative sentiment
+                elif sentimentTweet.sentiment.polairty < 0:
+                    print("tweeeting")
+                    api.update_status(status = "@" + tweet.user.screen_name + " you're wrong; The Batan is going to be great", in_reply_to_status_id = tweet.id , auto_populate_reply_metadata=True)
+                    checkedIDs.append(tweet.id)
+            if 'mr.davies' in tweet.text.lower():
+                sentimentTweet = TextBlob(tweet.text)
+                if sentimentTweet.sentiment.polarity >= 0:
+                    print("tweeting")
+                    # makes a tweet @ing the user. the 'tweet.id' makes it go into a response to a specific thread
+                    api.update_status(status = "@" + tweet.user.screen_name + " I know that guy!", in_reply_to_status_id = tweet.id , auto_populate_reply_metadata=True)
                     checkedIDs.append(tweet.id)
                     # adds replied tweet ID to list
+                elif sentimentTweet.sentiment.polarity < 0:
+                    print("tweeting")
+                    # makes a tweet @ing the user. the 'tweet.id' makes it go into a response to a specific thread
+                    api.update_status(status = "@" + tweet.user.screen_name + " Don't talk about him like that!", in_reply_to_status_id = tweet.id , auto_populate_reply_metadata=True)
+                    checkedIDs.append(tweet.id)
+                    # adds replied tweet ID to list
+            if 'twitter api' in tweet.text.lower():
+                # makes a tweet @ing the user. the 'tweet.id' makes it go into a response to a specific thread
+                print("tweeting")
+                api.update_status(status = "@" + tweet.user.screen_name + " I use that!", in_reply_to_status_id = tweet.id , auto_populate_reply_metadata=True)
+                checkedIDs.append(tweet.id)
+                # adds replied tweet ID to list
 
 while True:
     checkData()
     time.sleep(15)
 
+
+"""
+testing and making notes on textblob sentiment analysis
+the text to be analysed must be put into the textblob data structure using TextBlob(text)
+using .tags we can see the words in a 2d array of token and sentiment tag. 
+.sentences will break a textblob into sentence tokens
+.words will break it into word tokens
+using sentence.sentiment.polarity will output a value from -1 to 1 of the sentiment.
+"""
 
