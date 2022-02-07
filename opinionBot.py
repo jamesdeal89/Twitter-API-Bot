@@ -50,6 +50,6 @@ def checkData():
 
 while True:
     checkData()
-    time.sleep(10)
+    time.sleep(15)
 
 
