@@ -16,22 +16,6 @@ api = tweepy.API(auth)
 
 loggedID= []
 
-def inWords(x):
-    if x < 0.2 and x > -0.2:
-        return "Mostly Neutral"
-    elif x <= -0.2 and x > -0.3:
-        return "Leaning Negative"
-    elif x >= 0.2 and x < 0.3:
-        return "Leaning Positive"
-    elif x <= -0.3 and x > -0.5:
-        return "Mostly Negative"
-    elif x >= 0.3 and x < 0.5:
-        return "Mostly Positive"
-    elif x <= -0.5:
-        return "Overwhelmingly Negative"
-    elif x >= 0.5:
-        return "Overwhelimgly Positive"
-
 def checkData():
     # gets the raw data of all the tweets @ the bot
     # includes lots and lots of complex data we don't need
@@ -62,7 +46,7 @@ def checkData():
                     print("tweeting")
                     api.update_status(status = "@" + tweet.user.screen_name + " you're wrong; The Batman is going to be great", in_reply_to_status_id = tweet.id , auto_populate_reply_metadata=True)
                     loggedID.append(tweet.id)
-        elif 'mr.davies' in tweet.text.lower():
+        if 'mr.davies' in tweet.text.lower():
             sentimentTweet = textblob.TextBlob(tweet.text)
             if tweet.id in loggedID:
                 print("skipping "+ str(tweet.id))
@@ -79,7 +63,7 @@ def checkData():
                     api.update_status(status = "@" + tweet.user.screen_name + " Don't talk about him like that!", in_reply_to_status_id = tweet.id , auto_populate_reply_metadata=True)
                     loggedID.append(tweet.id)
                     # adds replied tweet ID to file
-        elif 'twitter api' in tweet.text.lower():
+        if 'twitter api' in tweet.text.lower():
             if tweet.id in loggedID:
                 print("skipping "+ str(tweet.id))
             else:
@@ -88,7 +72,7 @@ def checkData():
                 api.update_status(status = "@" + tweet.user.screen_name + " I use that!", in_reply_to_status_id = tweet.id , auto_populate_reply_metadata=True)
                 loggedID.append(tweet.id)
                 # adds replied tweet ID to file
-        elif 'you' in tweet.text.lower() or ' opinionbotcs' in tweet.text.lower():
+        if 'you' in tweet.text.lower() or ' opinionbotcs' in tweet.text.lower():
             sentimentTweet = textblob.TextBlob(tweet.text)
             if tweet.id in loggedID:
                 print("skipping "+ str(tweet.id))
@@ -101,7 +85,7 @@ def checkData():
                     print("tweeting")
                     api.update_status(status = "@" + tweet.user.screen_name + " That's just rude!", in_reply_to_status_id = tweet.id , auto_populate_reply_metadata=True)
                     loggedID.append(tweet.id)
-        elif 'analyse' in tweet.text.lower():
+        if 'analyse' in tweet.text.lower():
             #find hashtag
             print(tweet.id, loggedID) 
             if str(tweet.id) in str(loggedID):
@@ -122,19 +106,11 @@ def checkData():
                 #create average sentiment score
                 avgPolarity = totalPolarity / counter
                 rndPolarity = round(avgPolarity, ndigits=3)
-                # make an easy to understand sentiment scale in words to go alongside it
-                wordRating = inWords(rndPolarity)
                 #return score to user in a reply
-                api.update_status(status = "@" + tweet.user.screen_name + " The sentiment polarity of " + hashtag + " is: " + wordRating + "(" + str(rndPolarity) + ")" + " based on " + str(counter) + " samples", in_reply_to_status_id = tweet.id , auto_populate_reply_metadata=True)
+                api.update_status(status = "@" + tweet.user.screen_name + " The sentiment polarity of " + hashtag + " is:" + str(rndPolarity) + " based on " + str(counter) + " samples", in_reply_to_status_id = tweet.id , auto_populate_reply_metadata=True)
                 # adds replied tweet ID to file
                 loggedID.append(tweet.id)
-        elif 'testing' in tweet.text.lower():
-            # this is for checking and testing the TextBlob sentiment values with test data
-            dataText = textblob.TextBlob(tweet.text)
-            Polarity = dataText.sentiment.polarity
-            wordRating = inWords(Polarity)
-            api.update_status(status = "@" + tweet.user.screen_name + " Your test tweet's polarity value is: " + + Polarity + "(" + wordRating + ")", in_reply_to_status_id = tweet.id , auto_populate_reply_metadata=True)
-
+                
 
 
 while True:
