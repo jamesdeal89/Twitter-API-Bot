@@ -133,7 +133,7 @@ def checkData():
             dataText = textblob.TextBlob(tweet.text)
             Polarity = dataText.sentiment.polarity
             wordRating = inWords(Polarity)
-            api.update_status(status = "@" + tweet.user.screen_name + " Your test tweet's polarity value is: " + + Polarity + "(" + wordRating + ")", in_reply_to_status_id = tweet.id , auto_populate_reply_metadata=True)
+            api.update_status(status = "@" + tweet.user.screen_name + " Your test tweet's polarity value is: " + str(Polarity) + "(" + wordRating + ")", in_reply_to_status_id = tweet.id , auto_populate_reply_metadata=True)
 
 
 
