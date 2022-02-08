@@ -17,19 +17,19 @@ api = tweepy.API(auth)
 loggedID= []
 
 def inWords(x):
-    if x < 0.2 and x > -0.2:
+    if x < 0.05 and x > -0.05:
         return "Mostly Neutral"
-    elif x <= -0.2 and x > -0.3:
+    elif x <= -0.05 and x > -0.1:
         return "Leaning Negative"
-    elif x >= 0.2 and x < 0.3:
+    elif x >= 0.05 and x < 0.1:
         return "Leaning Positive"
-    elif x <= -0.3 and x > -0.5:
+    elif x <= -0.1 and x > -0.12:
         return "Mostly Negative"
-    elif x >= 0.3 and x < 0.5:
+    elif x >= 0.1 and x < 0.12:
         return "Mostly Positive"
-    elif x <= -0.5:
+    elif x <= -0.12:
         return "Overwhelmingly Negative"
-    elif x >= 0.5:
+    elif x >= 0.12:
         return "Overwhelimgly Positive"
 
 def checkData():
@@ -131,10 +131,10 @@ def checkData():
         elif 'testing' in tweet.text.lower():
             # this is for checking and testing the TextBlob sentiment values with test data
             dataText = textblob.TextBlob(tweet.text)
-            Polarity = dataText.sentiment.polarity
+            Polarity = round(dataText.sentiment.polarity, ndigits=3)
             wordRating = inWords(Polarity)
             api.update_status(status = "@" + tweet.user.screen_name + " Your test tweet's polarity value is: " + str(Polarity) + "(" + wordRating + ")", in_reply_to_status_id = tweet.id , auto_populate_reply_metadata=True)
-
+            loggedID.append(tweet.id)
 
 
 while True:
