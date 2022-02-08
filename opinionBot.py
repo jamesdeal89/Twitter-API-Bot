@@ -129,12 +129,15 @@ def checkData():
                 # adds replied tweet ID to file
                 loggedID.append(tweet.id)
         elif 'testing' in tweet.text.lower():
-            # this is for checking and testing the TextBlob sentiment values with test data
-            dataText = textblob.TextBlob(tweet.text)
-            Polarity = round(dataText.sentiment.polarity, ndigits=3)
-            wordRating = inWords(Polarity)
-            api.update_status(status = "@" + tweet.user.screen_name + " Your test tweet's polarity value is: " + str(Polarity) + "(" + wordRating + ")", in_reply_to_status_id = tweet.id , auto_populate_reply_metadata=True)
-            loggedID.append(tweet.id)
+            if str(tweet.id) in str(loggedID):
+                print("skipping " + str(tweet.id))
+            else:
+                # this is for checking and testing the TextBlob sentiment values with test data
+                dataText = textblob.TextBlob(tweet.text)
+                Polarity = round(dataText.sentiment.polarity, ndigits=3)
+                wordRating = inWords(Polarity)
+                api.update_status(status = "@" + tweet.user.screen_name + " Your test tweet's polarity value is: " + str(Polarity) + "(" + wordRating + ")", in_reply_to_status_id = tweet.id , auto_populate_reply_metadata=True)
+                loggedID.append(tweet.id)
 
 
 while True:
