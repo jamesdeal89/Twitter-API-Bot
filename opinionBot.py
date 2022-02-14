@@ -3,6 +3,7 @@ from audioop import avg
 import tweepy
 import textblob
 import time
+import GPTgenerator
 
 # authentication for Twitter API
 CONSUMER_KEY = 'ed03MoV3IRwE083w1Kqx1RxZ0'
@@ -13,6 +14,7 @@ ACCESS_SECRET = 'Ws4kEpwjM6YdJH31qwmn8r7ROz1fnN8VtlM9d47ZpmRyH'
 auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
 auth.set_access_token(ACCESS_KEY, ACCESS_SECRET)
 api = tweepy.API(auth)
+
 
 loggedID= []
 
@@ -54,13 +56,19 @@ def checkData():
                 if sentimentTweet.sentiment.polarity >= 0:
                     print("tweeting")
                     # makes a tweet @ing the user. the 'tweet.id' makes it go into a response to a specific thread
-                    api.update_status(status = "@" + tweet.user.screen_name + " hyped!", in_reply_to_status_id = tweet.id , auto_populate_reply_metadata=True)
+                    try:
+                        api.update_status(status = "@" + tweet.user.screen_name + " hyped!", in_reply_to_status_id = tweet.id , auto_populate_reply_metadata=True)
+                    except:
+                        print("API error when responding")
                     # adds replied tweet ID to file
                     loggedID.append(tweet.id)
                 # checks if the tweet has negative sentiment
                 elif sentimentTweet.sentiment.polarity < 0:
                     print("tweeting")
-                    api.update_status(status = "@" + tweet.user.screen_name + " you're wrong; The Batman is going to be great", in_reply_to_status_id = tweet.id , auto_populate_reply_metadata=True)
+                    try:
+                        api.update_status(status = "@" + tweet.user.screen_name + " you're wrong; The Batman is going to be great", in_reply_to_status_id = tweet.id , auto_populate_reply_metadata=True)
+                    except:
+                        print("API error when responding")
                     loggedID.append(tweet.id)
         elif 'mr.davies' in tweet.text.lower():
             sentimentTweet = textblob.TextBlob(tweet.text)
@@ -70,13 +78,19 @@ def checkData():
                 if sentimentTweet.sentiment.polarity >= 0:
                     print("tweeting")
                     # makes a tweet @ing the user. the 'tweet.id' makes it go into a response to a specific thread
-                    api.update_status(status = "@" + tweet.user.screen_name + " I know that guy!", in_reply_to_status_id = tweet.id , auto_populate_reply_metadata=True)
+                    try:
+                        api.update_status(status = "@" + tweet.user.screen_name + " I know that guy!", in_reply_to_status_id = tweet.id , auto_populate_reply_metadata=True)
+                    except:
+                        print("API error when responding")
                     loggedID.append(tweet.id)
                     # adds replied tweet ID to file
                 elif sentimentTweet.sentiment.polarity < 0:
                     print("tweeting")
                     # makes a tweet @ing the user. the 'tweet.id' makes it go into a response to a specific thread
-                    api.update_status(status = "@" + tweet.user.screen_name + " Don't talk about him like that!", in_reply_to_status_id = tweet.id , auto_populate_reply_metadata=True)
+                    try:
+                        api.update_status(status = "@" + tweet.user.screen_name + " Don't talk about him like that!", in_reply_to_status_id = tweet.id , auto_populate_reply_metadata=True)
+                    except:
+                        print("API error when responding")
                     loggedID.append(tweet.id)
                     # adds replied tweet ID to file
         elif 'twitter api' in tweet.text.lower():
@@ -85,7 +99,10 @@ def checkData():
             else:
                 # makes a tweet @ing the user. the 'tweet.id' makes it go into a response to a specific thread
                 print("tweeting")
-                api.update_status(status = "@" + tweet.user.screen_name + " I use that!", in_reply_to_status_id = tweet.id , auto_populate_reply_metadata=True)
+                try:
+                    api.update_status(status = "@" + tweet.user.screen_name + " I use that!", in_reply_to_status_id = tweet.id , auto_populate_reply_metadata=True)
+                except:
+                    print("API error when responding")
                 loggedID.append(tweet.id)
                 # adds replied tweet ID to file
         elif 'you' in tweet.text.lower() or ' opinionbotcs' in tweet.text.lower():
@@ -95,11 +112,17 @@ def checkData():
             else:
                 if sentimentTweet.sentiment.polarity >= 0:
                     print("tweeting")
-                    api.update_status(status = "@" + tweet.user.screen_name + " Thank you for your feedback!", in_reply_to_status_id = tweet.id , auto_populate_reply_metadata=True)
+                    try:
+                        api.update_status(status = "@" + tweet.user.screen_name + " Thank you for your feedback!", in_reply_to_status_id = tweet.id , auto_populate_reply_metadata=True)
+                    except:
+                        print("API error when responding")
                     loggedID.append(tweet.id)
                 elif sentimentTweet.sentiment.polarity < 0:
                     print("tweeting")
-                    api.update_status(status = "@" + tweet.user.screen_name + " That's just rude!", in_reply_to_status_id = tweet.id , auto_populate_reply_metadata=True)
+                    try:
+                        api.update_status(status = "@" + tweet.user.screen_name + " That's just rude!", in_reply_to_status_id = tweet.id , auto_populate_reply_metadata=True)
+                    except:
+                        print("API error when responding")
                     loggedID.append(tweet.id)
         elif 'analyse' in tweet.text.lower():
             #find hashtag
@@ -125,7 +148,10 @@ def checkData():
                 # make an easy to understand sentiment scale in words to go alongside it
                 wordRating = inWords(rndPolarity)
                 #return score to user in a reply
-                api.update_status(status = "@" + tweet.user.screen_name + " The sentiment polarity of " + hashtag + " is: " + wordRating + "(" + str(rndPolarity) + ")" + " based on " + str(counter) + " samples", in_reply_to_status_id = tweet.id , auto_populate_reply_metadata=True)
+                try:
+                    api.update_status(status = "@" + tweet.user.screen_name + " The sentiment polarity of " + hashtag + " is: " + wordRating + "(" + str(rndPolarity) + ")" + " based on " + str(counter) + " samples", in_reply_to_status_id = tweet.id , auto_populate_reply_metadata=True)
+                except:
+                    print("API error when responding")
                 # adds replied tweet ID to file
                 loggedID.append(tweet.id)
         elif 'testing' in tweet.text.lower():
@@ -136,7 +162,27 @@ def checkData():
                 dataText = textblob.TextBlob(tweet.text)
                 Polarity = round(dataText.sentiment.polarity, ndigits=3)
                 wordRating = inWords(Polarity)
-                api.update_status(status = "@" + tweet.user.screen_name + " Your test tweet's polarity value is: " + str(Polarity) + "(" + wordRating + ")", in_reply_to_status_id = tweet.id , auto_populate_reply_metadata=True)
+                try:
+                    api.update_status(status = "@" + tweet.user.screen_name + " Your test tweet's polarity value is: " + str(Polarity) + "(" + wordRating + ")", in_reply_to_status_id = tweet.id , auto_populate_reply_metadata=True)
+                except:
+                    print("API error when responding")
+                loggedID.append(tweet.id)
+        elif 'chat' in tweet.text.lower():
+            if str(tweet.id) in str(loggedID):
+                print("skipping" + str(tweet.id))
+            else:
+                # cuts out the "@opinionbotcs" part of the tweet as it messes with the AI
+                location = tweet.text.find("chat") + 4
+                prompt = tweet.text[location:]
+                # Uses an implemnetation module I made of the GPT Neo AI and passes in the tweet as the AI prompt
+                response = GPTgenerator.generate(tweet.text, 140)
+                response = GPTgenerator.generate(tweet.text, 140)
+                # Responds with the text from the AI
+                try:
+                    api.update_status(status = "@" + tweet.user.screen_name + response, in_reply_to_status_id = tweet.id , auto_populate_reply_metadata=True)
+                    print("tweeting")
+                except:
+                    print("API error when responding")
                 loggedID.append(tweet.id)
 
 
