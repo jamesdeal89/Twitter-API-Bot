@@ -4,6 +4,7 @@ import tweepy
 import textblob
 import time
 import GPTgenerator
+import random
 
 # authentication for Twitter API
 CONSUMER_KEY = 'ed03MoV3IRwE083w1Kqx1RxZ0'
@@ -17,6 +18,8 @@ api = tweepy.API(auth)
 
 
 loggedID= []
+timeCount = 43201
+prompts = ["iPhones", "Apple", "Facebook", "Twitter", "Artifical Intelligence", "Google", "Memes", "Python", "Programming", "Batman", "Conspiracy Theories", "Computer Science", "The future", "Life", "Elon Musk", "Books", "Marvel"]
 
 def inWords(x):
     if x < 0.05 and x > -0.05:
@@ -189,6 +192,18 @@ def checkData():
 while True:
     checkData()
     time.sleep(15)
+    timeCount += 15
+    # makes an AI generated tweet if it's been more than 12 hours since the last one
+    if timeCount > 43200:
+        # selects a random AI prompt from a list of many topics
+        prompt = random.choice(prompts)
+        dailyTweet = GPTgenerator.generate(prompt, 140)
+        try: 
+            api.update_status(status = dailyTweet)
+            print("Tweeting daily tweet")
+        except:
+            print("API error when tweeting")
+        timeCount = 0
 
 
 """
