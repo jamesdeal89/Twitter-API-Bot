@@ -108,6 +108,7 @@ def checkData():
                     print("API error when responding")
                 loggedID.append(tweet.id)
                 # adds replied tweet ID to file
+        """ commented out because sometimes conflicts with chat function
         elif 'you' in tweet.text.lower() or ' opinionbotcs' in tweet.text.lower():
             sentimentTweet = textblob.TextBlob(tweet.text)
             if tweet.id in loggedID:
@@ -126,8 +127,8 @@ def checkData():
                         api.update_status(status = "@" + tweet.user.screen_name + " That's just rude!", in_reply_to_status_id = tweet.id , auto_populate_reply_metadata=True)
                     except:
                         print("API error when responding")
-                    loggedID.append(tweet.id)
-        elif 'analyse' in tweet.text.lower():
+                    loggedID.append(tweet.id)"""
+        if 'analyse' in tweet.text.lower():
             #find hashtag
             print(tweet.id, loggedID) 
             if str(tweet.id) in str(loggedID):
@@ -178,8 +179,8 @@ def checkData():
                 location = tweet.text.find("chat") + 4
                 prompt = tweet.text[location:]
                 # Uses an implemnetation module I made of the GPT Neo AI and passes in the tweet as the AI prompt
-                response = GPTgenerator.generate(tweet.text, 140)
-                response = GPTgenerator.generate(tweet.text, 140)
+                response = GPTgenerator.generate(prompt, 140)
+                response = GPTgenerator.generate(prompt, 140)
                 # Responds with the text from the AI
                 try:
                     api.update_status(status = "@" + tweet.user.screen_name + response, in_reply_to_status_id = tweet.id , auto_populate_reply_metadata=True)
