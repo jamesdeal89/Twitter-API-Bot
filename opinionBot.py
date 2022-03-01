@@ -37,7 +37,40 @@ def inWords(x):
     elif x >= 0.12:
         return "Overwhelimgly Positive"
 
+
+def polarityCheck(key,response,response1):
+    """key is the word that has to be in the tweet to trigger the subroutine
+    response is the reply if the tweet is positive
+    response1 is the reply if the tweet is negative"""
+    if key in tweet.text.lower():
+            # creates a TextBlob version of the tweet for sentiment analysis
+            sentimentTweet = textblob.TextBlob(tweet.text)
+            # checks if the tweet has positive sentiment
+            if tweet.id in loggedID:
+                print("skipping "+ str(tweet.id))
+            else:
+                if sentimentTweet.sentiment.polarity >= 0:
+                    print("tweeting")
+                    # makes a tweet @ing the user. the 'tweet.id' makes it go into a response to a specific thread
+                    try:
+                        api.update_status(status = "@" + tweet.user.screen_name + response, in_reply_to_status_id = tweet.id , auto_populate_reply_metadata=True)
+                    except:
+                        print("API error when responding")
+                    # adds replied tweet ID to file
+                    loggedID.append(tweet.id)
+                # checks if the tweet has negative sentiment
+                elif sentimentTweet.sentiment.polarity < 0:
+                    print("tweeting")
+                    try:
+                        api.update_status(status = "@" + tweet.user.screen_name + response1, in_reply_to_status_id = tweet.id , auto_populate_reply_metadata=True)
+                    except:
+                        print("API error when responding")
+                    loggedID.append(tweet.id)
+
+
+
 def checkData():
+    global tweet
     # gets the raw data of all the tweets @ the bot
     # includes lots and lots of complex data we don't need
     mentions = api.mentions_timeline()
@@ -49,97 +82,22 @@ def checkData():
         # prints the tweet ID and pure extracted tweet text
         print(tweet.id, tweet.text)
         # checks for a specific hastag in the tweet.
-        if '#thebatman' in tweet.text.lower():
-            # creates a TextBlob version of the tweet for sentiment analysis
-            sentimentTweet = textblob.TextBlob(tweet.text)
-            # checks if the tweet has positive sentiment
-            if tweet.id in loggedID:
-                print("skipping "+ str(tweet.id))
-            else:
-                if sentimentTweet.sentiment.polarity >= 0:
-                    print("tweeting")
-                    # makes a tweet @ing the user. the 'tweet.id' makes it go into a response to a specific thread
-                    try:
-                        api.update_status(status = "@" + tweet.user.screen_name + " hyped!", in_reply_to_status_id = tweet.id , auto_populate_reply_metadata=True)
-                    except:
-                        print("API error when responding")
-                    # adds replied tweet ID to file
-                    loggedID.append(tweet.id)
-                # checks if the tweet has negative sentiment
-                elif sentimentTweet.sentiment.polarity < 0:
-                    print("tweeting")
-                    try:
-                        api.update_status(status = "@" + tweet.user.screen_name + " you're wrong; The Batman is going to be great", in_reply_to_status_id = tweet.id , auto_populate_reply_metadata=True)
-                    except:
-                        print("API error when responding")
-                    loggedID.append(tweet.id)
-        elif 'mr.davies' in tweet.text.lower():
-            sentimentTweet = textblob.TextBlob(tweet.text)
-            if tweet.id in loggedID:
-                print("skipping "+ str(tweet.id))
-            else:
-                if sentimentTweet.sentiment.polarity >= 0:
-                    print("tweeting")
-                    # makes a tweet @ing the user. the 'tweet.id' makes it go into a response to a specific thread
-                    try:
-                        api.update_status(status = "@" + tweet.user.screen_name + " I know that guy!", in_reply_to_status_id = tweet.id , auto_populate_reply_metadata=True)
-                    except:
-                        print("API error when responding")
-                    loggedID.append(tweet.id)
-                    # adds replied tweet ID to file
-                elif sentimentTweet.sentiment.polarity < 0:
-                    print("tweeting")
-                    # makes a tweet @ing the user. the 'tweet.id' makes it go into a response to a specific thread
-                    try:
-                        api.update_status(status = "@" + tweet.user.screen_name + " Don't talk about him like that!", in_reply_to_status_id = tweet.id , auto_populate_reply_metadata=True)
-                    except:
-                        print("API error when responding")
-                    loggedID.append(tweet.id)
-                    # adds replied tweet ID to file
-        elif 'twitter api' in tweet.text.lower():
-            if tweet.id in loggedID:
-                print("skipping "+ str(tweet.id))
-            else:
-                # makes a tweet @ing the user. the 'tweet.id' makes it go into a response to a specific thread
-                print("tweeting")
-                try:
-                    api.update_status(status = "@" + tweet.user.screen_name + " I use that!", in_reply_to_status_id = tweet.id , auto_populate_reply_metadata=True)
-                except:
-                    print("API error when responding")
-                loggedID.append(tweet.id)
-                # adds replied tweet ID to file
-        """ commented out because sometimes conflicts with chat function
-        elif 'you' in tweet.text.lower() or ' opinionbotcs' in tweet.text.lower():
-            sentimentTweet = textblob.TextBlob(tweet.text)
-            if tweet.id in loggedID:
-                print("skipping "+ str(tweet.id))
-            else:
-                if sentimentTweet.sentiment.polarity >= 0:
-                    print("tweeting")
-                    try:
-                        api.update_status(status = "@" + tweet.user.screen_name + " Thank you for your feedback!", in_reply_to_status_id = tweet.id , auto_populate_reply_metadata=True)
-                    except:
-                        print("API error when responding")
-                    loggedID.append(tweet.id)
-                elif sentimentTweet.sentiment.polarity < 0:
-                    print("tweeting")
-                    try:
-                        api.update_status(status = "@" + tweet.user.screen_name + " That's just rude!", in_reply_to_status_id = tweet.id , auto_populate_reply_metadata=True)
-                    except:
-                        print("API error when responding")
-                    loggedID.append(tweet.id)"""
+        polarityCheck("#thebatman", " hyped!", " you're wrong!")
+        polarityCheck("mr.davies"," I know that guy!", " don't talk about them like that!")
+        polarityCheck("feedback", "thanks!", "That's just rude!")
+        polarityCheck("twitter API", "I use that!", "Works for me though!")
         if 'analyse' in tweet.text.lower():
-            #find hashtag
             print(tweet.id, loggedID) 
             if str(tweet.id) in str(loggedID):
                 print("skipping "+ str(tweet.id))
             else:
+                # find hashtag
                 location = tweet.text.find("#")
                 hashtag = tweet.text[location:]
                 print(hashtag)
-                #get sample of tweets using tweepy Cursor search the '.items' is the size of the sample. 'lang='en'' makes sure we get tweets which TextBlob can analyse.
+                # get sample of tweets using tweepy Cursor search the '.items' is the size of the sample. 'lang='en'' makes sure we get tweets which TextBlob can analyse.
                 sample = api.search_tweets(q=hashtag, lang = 'en')
-                #analyse tweet sentiments
+                # analyse tweet sentiments
                 totalPolarity = 0
                 counter = 0
                 for dataPoint in sample:
