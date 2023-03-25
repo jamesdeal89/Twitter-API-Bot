@@ -8,7 +8,7 @@ A Twitter Bot which uses Tweepy and TextBlob modules to automatically reply to u
  - textblob
 
 ## The page on twitter (currently offline)
-<img src="profile.png">
+<img src="twitter.png">
 
 ## An example of it being used for sentiment
 <img src="tweet.png">
